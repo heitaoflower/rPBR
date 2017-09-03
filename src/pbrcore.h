@@ -470,8 +470,7 @@ Environment LoadEnvironment(const char *filename, int cubemapSize, int irradianc
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // Create projection (transposed) and different views for each face
-    Matrix captureProjection = MatrixPerspective(90.0f, 1.0f, 0.01, 1000.0);
-    MatrixTranspose(&captureProjection);
+    Matrix captureProjection = MatrixPerspective(90.0f*DEG2RAD, 1.0f, 0.01, 1000.0);
     Matrix captureViews[6] = {
         MatrixLookAt((Vector3){ 0.0f, 0.0f, 0.0f }, (Vector3){ 1.0f, 0.0f, 0.0f }, (Vector3){ 0.0f, -1.0f, 0.0f }),
         MatrixLookAt((Vector3){ 0.0f, 0.0f, 0.0f }, (Vector3){ -1.0f, 0.0f, 0.0f }, (Vector3){ 0.0f, -1.0f, 0.0f }),
@@ -606,18 +605,14 @@ Environment LoadEnvironment(const char *filename, int cubemapSize, int irradianc
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Then before rendering, configure the viewport to the actual screen dimensions
-    Matrix defaultProjection = MatrixPerspective(60.0, (double)GetScreenWidth()/(double)GetScreenHeight(), 0.01, 1000.0);
-    MatrixTranspose(&defaultProjection);
-    SetShaderValueMatrix(cubeShader, cubeProjectionLoc, defaultProjection);
+    Matrix defaultProjection = MatrixPerspective(60.0f*DEG2RAD, (double)GetScreenWidth()/(double)GetScreenHeight(), 0.01, 1000.0);
     SetShaderValueMatrix(env.skyShader, skyProjectionLoc, defaultProjection);
-    SetShaderValueMatrix(irradianceShader, irradianceProjectionLoc, defaultProjection);
-    SetShaderValueMatrix(prefilterShader, prefilterProjectionLoc, defaultProjection);
     env.pbrViewLoc = GetShaderLocation(env.pbrShader, "viewPos");
     env.modelMatrixLoc = GetShaderLocation(env.pbrShader, "mMatrix");
 
     // Reset viewport dimensions to default
     glViewport(0, 0, GetScreenWidth(), GetScreenHeight());
-    
+
     UnloadShader(cubeShader);
     UnloadShader(irradianceShader);
     UnloadShader(prefilterShader);
